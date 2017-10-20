@@ -12,8 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func crawlImages(link string) []string {
-	rawContents := getContents(link)
+func crawlImages(rawContents io.ReadCloser) []string {
 
 	z := html.NewTokenizer(rawContents)
 	imagesFound := []string{}

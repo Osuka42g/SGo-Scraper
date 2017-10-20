@@ -17,7 +17,8 @@ func main() {
 	}
 	albumURL := os.Args[1]
 
-	imagesFound := crawlImages(albumURL)
+	pageSource := getContents(albumURL)
+	imagesFound := crawlImages(pageSource)
 
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
 
