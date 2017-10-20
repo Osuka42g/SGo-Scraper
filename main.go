@@ -22,8 +22,8 @@ func main() {
 
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
 
-	modelName := getModelName()
-	albumName := getAlbumName()
+	modelName := getModelName(pageSource)
+	albumName := getAlbumName(pageSource)
 
 	albumDir := downloadsDir + "/" + modelName + " - " + albumName
 
@@ -31,7 +31,7 @@ func main() {
 	checkAndCreateDir(albumDir)
 
 	for i, imageURL := range imagesFound {
-		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(i)%2) + ".jpg"
+		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(len(imagesFound))-1) + ".jpg"
 		fmt.Println(imageURL + " -> " + imageOutput)
 
 		b, _ := saveImage(imageURL, imageOutput)

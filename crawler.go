@@ -29,7 +29,7 @@ func crawlImages(rawContents io.ReadCloser) []string {
 			if !isAnchor {
 				continue
 			}
-			link := getHref(t)
+			link := getValueFromAttribute(t, "href")
 			if link == "" {
 				continue
 			}
@@ -42,11 +42,30 @@ func crawlImages(rawContents io.ReadCloser) []string {
 }
 
 // todo
-func getAlbumName() string {
-	return "album"
+func getAlbumName(rawContents io.ReadCloser) string {
+	z := html.NewTokenizer(rawContents)
+	albumName := ""
+	for {
+		tt := z.Next()
+
+		switch {
+		case tt == html.ErrorToken:
+			return albumName
+		case tt == html.StartTagToken:
+			t := z.Token()
+			isHeader := t.Data == "h2"
+			if !isHeader {
+				continue
+			}
+			if getValueFromAttribute(t, "class") == "title" {
+
+			}
+			fmt.Println(t)
+		}
+	}
 }
 
-func getModelName() string {
+func getModelName(rawContents io.ReadCloser) string {
 	return "model"
 }
 
@@ -82,13 +101,13 @@ func getContents(link string) io.ReadCloser {
 	return resp.Body
 }
 
-func getHref(t html.Token) string {
-	href := ""
+func getValueFromAttribute(t html.Token, attr string) string {
+	val := ""
 	for _, a := range t.Attr {
-		if a.Key == "href" {
-			href = a.Val
+		if a.Key == attr {
+			val = a.Val
 		}
 	}
 
-	return href
+	return val
 }
