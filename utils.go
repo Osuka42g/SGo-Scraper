@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -20,6 +22,8 @@ func leftPad(s string, padStr string, pLen int) string {
 	return strings.Repeat(padStr, pLen) + s
 }
 
-func saveImage() {
-
+func saveImage(url string, output string) (int64, error) {
+	img, _ := os.Create(output)
+	resp, _ := http.Get(url)
+	return io.Copy(img, resp.Body)
 }

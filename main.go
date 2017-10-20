@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"strconv"
 
@@ -11,31 +9,31 @@ import (
 )
 
 func main() {
+	downloadsDir := "downloads"
+
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
 	albumURL := os.Args[1]
 
-	ch := make(chan []string)
+	imagesFound := crawlImages(albumURL)
 
-	go crawlImages(albumURL, ch)
-	imagesFound := <-ch
+	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
 
-	fmt.Println("\nFound", len(imagesFound), "images in set. Downloading...")
+	modelName := getModelName()
+	albumName := getAlbumName()
 
-	checkAndCreateDir("downloads")
-	checkAndCreateDir("downloads/model - set")
+	albumDir := downloadsDir + "/" + modelName + " - " + albumName
+
+	checkAndCreateDir(downloadsDir)
+	checkAndCreateDir(albumDir)
 
 	for i, imageURL := range imagesFound {
-		fmt.Println(" - " + imageURL)
+		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(i)%2) + ".jpg"
+		fmt.Println(imageURL + " -> " + imageOutput)
 
-		imageOutput := "downloads/model - set/" + leftPad(strconv.Itoa(i), "0", digitsLen(i)%2) + ".jpg"
-		fmt.Println(imageOutput)
-		img, _ := os.Create(imageOutput)
-		resp, _ := http.Get(imageURL)
-
-		b, _ := io.Copy(img, resp.Body)
+		b, _ := saveImage(imageURL, imageOutput)
 		fmt.Println("File size:", b)
 	}
 

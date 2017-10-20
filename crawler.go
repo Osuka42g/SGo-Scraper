@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func crawlImages(link string, ch chan []string) {
+func crawlImages(link string) []string {
 	rawContents := getContents(link)
 
 	z := html.NewTokenizer(rawContents)
@@ -23,8 +23,7 @@ func crawlImages(link string, ch chan []string) {
 
 		switch {
 		case tt == html.ErrorToken:
-			ch <- imagesFound
-			return
+			return imagesFound
 		case tt == html.StartTagToken:
 			t := z.Token()
 			isAnchor := t.Data == "a"
@@ -44,8 +43,13 @@ func crawlImages(link string, ch chan []string) {
 }
 
 // todo
-func getAlbumName() {}
-func getModelName() {}
+func getAlbumName() string {
+	return "album"
+}
+
+func getModelName() string {
+	return "model"
+}
 
 func getContents(link string) io.ReadCloser {
 	sessionidCookie := os.Getenv("SESSIONIDTOKEN")
