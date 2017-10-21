@@ -32,6 +32,4 @@ go build
 In order to access to full albums, credentials to the site are required.
 Current implementation cannot just login to Suicide Girls because the login is captcha protected; so we are accesing the crawler with the cookie from our login.
 
-
-## Thanks
-Started with some implementation from [Gregory Schier's Blog](https://schier.co/blog/2015/04/26/a-simple-web-scraper-in-go.html)
+🍻

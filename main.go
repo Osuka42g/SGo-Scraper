@@ -18,12 +18,11 @@ func main() {
 	albumURL := os.Args[1]
 
 	pageSource := getContents(albumURL)
+	modelName, albumName := getAlbumInfo(pageSource)
 	imagesFound := crawlImages(pageSource)
 
+	fmt.Println("Found", albumName, "set from", modelName, "!")
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
-
-	modelName := getModelName(pageSource)
-	albumName := getAlbumName(pageSource)
 
 	albumDir := downloadsDir + "/" + modelName + " - " + albumName
 

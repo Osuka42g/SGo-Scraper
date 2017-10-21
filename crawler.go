@@ -12,8 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func crawlImages(rawContents io.ReadCloser) []string {
-
+func crawlImages(rawContents io.Reader) []string {
 	z := html.NewTokenizer(rawContents)
 	imagesFound := []string{}
 
@@ -41,35 +40,38 @@ func crawlImages(rawContents io.ReadCloser) []string {
 	}
 }
 
-// todo
-func getAlbumName(rawContents io.ReadCloser) string {
+func getAlbumInfo(rawContents io.Reader) (modelName string, albumName string) {
+	title := getTitle(rawContents)
+	s := strings.Split(title, " Photo Album: ")
+	ss := strings.Split(s[1], " | SuicideGirls")
+	modelName = s[0]
+	albumName = ss[0]
+	return
+}
+
+func getTitle(rawContents io.Reader) string {
 	z := html.NewTokenizer(rawContents)
-	albumName := ""
+	defaultTitle := ""
 	for {
 		tt := z.Next()
 
 		switch {
 		case tt == html.ErrorToken:
-			return albumName
+			return defaultTitle
 		case tt == html.StartTagToken:
 			t := z.Token()
-			isHeader := t.Data == "h2"
-			if !isHeader {
+			isTitle := t.Data == "title"
+			if !isTitle {
 				continue
 			}
-			if getValueFromAttribute(t, "class") == "title" {
-
-			}
-			fmt.Println(t)
+			z.Next()
+			title := z.Token()
+			return title.Data
 		}
 	}
 }
 
-func getModelName(rawContents io.ReadCloser) string {
-	return "model"
-}
-
-func getContents(link string) io.ReadCloser {
+func getContents(link string) io.Reader {
 	sessionidCookie := os.Getenv("SESSIONIDTOKEN")
 
 	jar, _ := cookiejar.New(nil)
