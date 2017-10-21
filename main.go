@@ -9,12 +9,12 @@ import (
 )
 
 func main() {
-	downloadsDir := "downloads"
-
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
+
+	downloadsDir := os.Getenv("DOWNLOADSDIR")
 	albumURL := os.Args[1]
 
 	pageSource := getContents(albumURL)

@@ -1,11 +1,14 @@
 # SGo-Scraper
 Download an entire selected Suicide Girls album.
+Just run by appending the URL of the album.
+- Automatically creates and sort download paths.
+- Hopefuls compatible.
 
 ## Requirements
 - Suicide Girls account.
 - Go 1.9
 
-## Installation
+## Usage
 ```
 git clone https://github.com/Osuka42g/SGo-Scraper.git
 cd SGo-Scraper
