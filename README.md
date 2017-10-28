@@ -17,12 +17,13 @@ cp .env.example .env
 ```
 
 Open `.env` and fill _SESSIONIDTOKEN_ with [your own Token](#getting-token).
-How to
 
 ```
 go build
 ./SGo-Scraper http://suicidegirls.com/full-url-to-the-suicidegirls-album
 ```
+
+If you want to also compress the downloaded files, append `-z` at the end as argument.
 
 ## Getting Token
 1. Using Google Chrome, log in into your Suicide Girls account.
