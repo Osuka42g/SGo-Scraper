@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
+	"fmt"
 )
 
 func checkAndCreateDir(path string) {
@@ -20,7 +20,7 @@ func digitsLen(n int) int {
 }
 
 func leftPad(s string, padStr string, pLen int) string {
-	return strings.Repeat(padStr, pLen) + s
+	return fmt.Sprintf("%"+padStr+strconv.Itoa(pLen)+"s", s)
 }
 
 func saveImage(url string, output string) (int64, error) {
