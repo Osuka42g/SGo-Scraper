@@ -32,14 +32,17 @@ func main() {
 	checkAndCreateDir(albumDir)
 	imagesDownloaded := make([]string, 0)
 
-	for i, imageURL := range imagesFound {
-		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(len(imagesFound))-1) + ".jpg"
-		fmt.Println(imageURL + " -> " + imageOutput)
-		imagesDownloaded = append(imagesDownloaded, imageOutput)
+	var wg sync.WaitGroup
+	wg.Add(len(imagesFound))
 
-		b, _ := saveImage(imageURL, imageOutput)
-		fmt.Println("File size:", b)
+	countSize := digitsLen(len(imagesFound))
+	for i, imageURL := range imagesFound {
+		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i+1), "0", countSize) + ".jpg"
+		go getFile(&wg, imageURL, imageOutput)
+		imagesDownloaded = append(imagesDownloaded, imageOutput)
 	}
+
+	wg.Wait()
 
 	if finalizeWithZip {
 		err := ZipFiles(albumDir+"/"+albumName+".zip", imagesDownloaded)
@@ -48,5 +51,18 @@ func main() {
 		}
 	}
 
+	fmt.Println("")
 	fmt.Println("Done... Enjoy!")
+	fmt.Println(albumDir)
+}
+
+func getFile(wg *sync.WaitGroup, imageURL string, outputUrl string) {
+	defer wg.Done()
+	fmt.Print(".")
+	b, _ := saveImage(imageURL, outputUrl)
+	if b > 0 {
+		fmt.Print("✓")
+	} else {
+		fmt.Print("✗")
+	}
 }
