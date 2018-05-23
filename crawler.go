@@ -44,9 +44,7 @@ func getAlbumInfo(rawContents io.Reader) (modelName string, albumName string) {
 	title := getTitle(rawContents)
 	s := strings.Split(title, " Photo Album: ")
 	ss := strings.Split(s[1], " | SuicideGirls")
-	modelName = s[0]
-	albumName = ss[0]
-	return
+	return strings.TrimSpace(s[0]), strings.TrimSpace(ss[0])
 }
 
 func getTitle(rawContents io.Reader) string {
