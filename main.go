@@ -30,7 +30,7 @@ func main() {
 
 	checkAndCreateDir(downloadsDir)
 	checkAndCreateDir(albumDir)
-	imagesDownloaded := []string{}
+	imagesDownloaded := make([]string, 0)
 
 	for i, imageURL := range imagesFound {
 		imageOutput := albumDir + "/" + leftPad(strconv.Itoa(i), "0", digitsLen(len(imagesFound))-1) + ".jpg"

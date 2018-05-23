@@ -14,7 +14,7 @@ import (
 
 func crawlImages(rawContents io.Reader) []string {
 	z := html.NewTokenizer(rawContents)
-	imagesFound := []string{}
+	imagesFound := make([]string, 0)
 
 	for {
 		tt := z.Next()
