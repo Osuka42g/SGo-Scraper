@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
+	"bufio"
+	"os"
 )
 
 func crawlImages(rawContents io.Reader) []string {
@@ -70,13 +71,13 @@ func getTitle(rawContents io.Reader) string {
 }
 
 func getContents(link string) io.Reader {
-	sessionidCookie := os.Getenv("SESSIONIDTOKEN")
+	sessionId := settings[settingsSessionId]
 
 	jar, _ := cookiejar.New(nil)
 	var cookies []*http.Cookie
 	cookie := &http.Cookie{
 		Name:   "sessionid",
-		Value:  sessionidCookie,
+		Value:  sessionId,
 		Path:   "/",
 		Domain: "www.suicidegirls.com",
 	}
@@ -85,7 +86,6 @@ func getContents(link string) io.Reader {
 
 	u, _ := url.Parse(link)
 	jar.SetCookies(u, cookies)
-	fmt.Println(jar.Cookies(u))
 
 	client := &http.Client{
 		Jar: jar,
@@ -93,6 +93,23 @@ func getContents(link string) io.Reader {
 
 	req, _ := http.NewRequest("GET", link, nil)
 	resp, err := client.Do(req)
+
+	checkSessionId := sessionId
+	for _, c := range resp.Cookies() {
+		if c.Name == "sessionid" {
+			checkSessionId = c.Value
+		}
+	}
+
+	if len(checkSessionId) < 100 {
+		fmt.Println("Session expired, enter new SessionID: ")
+		reader := bufio.NewReader(os.Stdin)
+		newSessionId, _ := reader.ReadString('\n')
+		settings[settingsSessionId] = newSessionId[:len(newSessionId)-1]
+		return getContents(link)
+	} else {
+		settings[settingsSessionId] = checkSessionId
+	}
 
 	if err != nil {
 		panic(err)
