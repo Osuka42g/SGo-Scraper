@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -9,8 +8,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
-	"bufio"
-	"os"
 )
 
 func crawlImages(rawContents io.Reader) []string {
@@ -93,23 +90,6 @@ func getContents(link string) io.Reader {
 
 	req, _ := http.NewRequest("GET", link, nil)
 	resp, err := client.Do(req)
-
-	checkSessionId := sessionId
-	for _, c := range resp.Cookies() {
-		if c.Name == "sessionid" {
-			checkSessionId = c.Value
-		}
-	}
-
-	if len(checkSessionId) < 100 {
-		fmt.Println("Session expired, enter new SessionID: ")
-		reader := bufio.NewReader(os.Stdin)
-		newSessionId, _ := reader.ReadString('\n')
-		settings[settingsSessionId] = newSessionId[:len(newSessionId)-1]
-		return getContents(link)
-	} else {
-		settings[settingsSessionId] = checkSessionId
-	}
 
 	if err != nil {
 		panic(err)

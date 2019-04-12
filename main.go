@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strconv"
 	"bufio"
-
 	"flag"
-	"log"
+	"fmt"
 	"github.com/joho/godotenv"
+	"log"
+	"os"
 	"os/user"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -28,6 +28,7 @@ func main() {
 		settingsDownloadsKey: "downloads",
 		settingsSessionId:    "",
 	}
+	scanner := bufio.NewScanner(os.Stdin)
 
 	// get application dir
 	usr, err := user.Current()
@@ -48,12 +49,21 @@ func main() {
 	flag.Parse()
 
 	fmt.Print("Please enter album URL: ")
-	reader := bufio.NewReader(os.Stdin)
-	albumURL, _ := reader.ReadString('\n')
+	scanner.Scan()
+	albumURL := scanner.Text()
 
 	pageSource := getContents(albumURL)
 	modelName, albumName := getAlbumInfo(pageSource)
 	imagesFound := crawlImages(pageSource)
+
+	for len(imagesFound) <= 0 {
+		fmt.Println("No images found.  Session may be expired, enter new SessionID: ")
+		scanner.Scan()
+		settings[settingsSessionId] = scanner.Text()
+		pageSource = getContents(albumURL)
+		modelName, albumName = getAlbumInfo(pageSource)
+		imagesFound = crawlImages(pageSource)
+	}
 
 	fmt.Println("Found", albumName, "set from", modelName, "!")
 	fmt.Println("Found", len(imagesFound), "images in set. Downloading...")
@@ -65,6 +75,9 @@ func main() {
 	imagesDownloaded := make([]string, 0)
 
 	godotenv.Write(settings, configPath)
+
+	fmt.Print(strings.Repeat(".", len(imagesFound)))
+	fmt.Print("\r")
 
 	var wg sync.WaitGroup
 	wg.Add(len(imagesFound))
@@ -92,7 +105,6 @@ func main() {
 
 func getFile(wg *sync.WaitGroup, imageURL string, outputUrl string) {
 	defer wg.Done()
-	fmt.Print(".")
 	b, _ := saveImage(imageURL, outputUrl)
 	if b > 0 {
 		fmt.Print("✓")
