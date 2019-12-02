@@ -77,7 +77,7 @@ func getContents(link string) io.Reader {
 	jar, _ := cookiejar.New(nil)
 	var cookies []*http.Cookie
 	cookie := &http.Cookie{
-		Name:   "sessionid",
+		Name:   "sessid",
 		Value:  sessionidCookie,
 		Path:   "/",
 		Domain: "www.suicidegirls.com",

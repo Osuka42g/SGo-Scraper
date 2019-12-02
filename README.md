@@ -29,7 +29,7 @@ If you want to also compress the downloaded files, append `-z` at the end as arg
 1. Using Google Chrome, log in into your Suicide Girls account.
 2. Pop out the developers console and go to _Application_ tab.
 3. At the left, go to Storage -> Cookies -> https://suicidegirls.com
-4. Scroll down until you find _sessionid_ cookie.
+4. Scroll down until you find _sessid_ cookie.
 5. Copy the value from _Value_ column.
 
 ##### Why this is needed?
