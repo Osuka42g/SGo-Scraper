@@ -19,7 +19,10 @@ const (
 )
 
 var (
-	settings map[string]string
+	settings        map[string]string
+	scanner         *bufio.Scanner
+	finalizeWithZip bool
+	configPath      string
 )
 
 func main() {
@@ -28,7 +31,7 @@ func main() {
 		settingsDownloadsKey: "downloads",
 		settingsSessionId:    "",
 	}
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner = bufio.NewScanner(os.Stdin)
 
 	// get application dir
 	usr, err := user.Current()
@@ -36,7 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	configPath := usr.HomeDir + "/.SGo-Scraper"
+	configPath = usr.HomeDir + "/.SGo-Scraper"
 
 	if _, err := os.Stat(configPath); err == nil {
 		settings, err = godotenv.Read(configPath)
@@ -45,9 +48,15 @@ func main() {
 		}
 	}
 
-	finalizeWithZip := flag.Bool("zip", false, "zip")
+	finalizeWithZip = *flag.Bool("zip", false, "zip")
 	flag.Parse()
 
+	for {
+		getUrl()
+	}
+}
+
+func getUrl() {
 	fmt.Print("Please enter album URL: ")
 	scanner.Scan()
 	albumURL := scanner.Text()
@@ -91,7 +100,7 @@ func main() {
 
 	wg.Wait()
 
-	if *finalizeWithZip {
+	if finalizeWithZip {
 		err := ZipFiles(albumDir+"/"+albumName+".zip", imagesDownloaded)
 		if err != nil {
 			panic(err)
