@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
+	"fmt"
 )
 
 func checkAndCreateDir(path string) {
@@ -20,12 +20,20 @@ func digitsLen(n int) int {
 }
 
 func leftPad(s string, padStr string, pLen int) string {
-	return strings.Repeat(padStr, pLen) + s
+	return fmt.Sprintf("%"+padStr+strconv.Itoa(pLen)+"s", s)
 }
 
 func saveImage(url string, output string) (int64, error) {
-	img, _ := os.Create(output)
-	resp, _ := http.Get(url)
+	img, err := os.Create(output)
+	if err != nil {
+		return 0, err
+	}
+	defer img.Close()
+	resp, err := http.Get(url)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
 	return io.Copy(img, resp.Body)
 }
 
@@ -46,6 +54,7 @@ func ZipFiles(filename string, files []string) error {
 		if err != nil {
 			return err
 		}
+		//noinspection GoDeferInLoop
 		defer zipfile.Close()
 
 		info, err := zipfile.Stat()
