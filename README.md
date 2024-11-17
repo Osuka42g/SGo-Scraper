@@ -1,3 +1,9 @@
+# Not maintaining this project anymore.
+
+### Feel free to fork and continue on your own
+
+===========
+
 # SGo-Scraper
 Download an entire selected Suicide Girls album.
 Just run by appending the URL of the album.
