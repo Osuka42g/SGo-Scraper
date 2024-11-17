@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -14,7 +12,7 @@ import (
 
 func crawlImages(rawContents io.Reader) []string {
 	z := html.NewTokenizer(rawContents)
-	imagesFound := []string{}
+	imagesFound := make([]string, 0)
 
 	for {
 		tt := z.Next()
@@ -44,9 +42,7 @@ func getAlbumInfo(rawContents io.Reader) (modelName string, albumName string) {
 	title := getTitle(rawContents)
 	s := strings.Split(title, " Photo Album: ")
 	ss := strings.Split(s[1], " | SuicideGirls")
-	modelName = s[0]
-	albumName = ss[0]
-	return
+	return strings.TrimSpace(s[0]), strings.TrimSpace(ss[0])
 }
 
 func getTitle(rawContents io.Reader) string {
@@ -72,13 +68,13 @@ func getTitle(rawContents io.Reader) string {
 }
 
 func getContents(link string) io.Reader {
-	sessionidCookie := os.Getenv("SESSIONIDTOKEN")
+	sessionId := settings[settingsSessionId]
 
 	jar, _ := cookiejar.New(nil)
 	var cookies []*http.Cookie
 	cookie := &http.Cookie{
 		Name:   "sessid",
-		Value:  sessionidCookie,
+		Value:  sessionId,
 		Path:   "/",
 		Domain: "www.suicidegirls.com",
 	}
@@ -87,7 +83,6 @@ func getContents(link string) io.Reader {
 
 	u, _ := url.Parse(link)
 	jar.SetCookies(u, cookies)
-	fmt.Println(jar.Cookies(u))
 
 	client := &http.Client{
 		Jar: jar,
